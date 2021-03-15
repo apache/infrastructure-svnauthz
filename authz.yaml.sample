@@ -1,0 +1,11 @@
+server:
+  url: https://pubsub.example.org:2070/
+  username: johndoe
+  password: super-duper-password
+
+commit:
+  topic: git/myrepository/commit
+  path: where/the/authz
+
+ldap:
+  topic: ldap
