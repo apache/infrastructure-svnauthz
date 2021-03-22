@@ -20,15 +20,16 @@ import re
 import ldap
 
 
-UID_RE = re.compile(r'^uid=([^,]*),.*')
-
-
 class FunkyLDAP(Exception):
     def __init__(self, cn):
         self.cn = cn
 
 
 class LDAPClient:
+    "An augmented connection to our LDAP servers."
+
+    # Extract UIDs from an LDAP response.
+    UID_RE = re.compile(r'^uid=([^,]*),.*')
 
     # Disable cert check. The self-signed cert throws off python-ldap.
     ### global option, not per connection? ugh.
@@ -63,5 +64,53 @@ class LDAPClient:
         # Sometimes the result items look like: uid=FOO,ou=people,...
         # Trim to just the uid values.
         if members[0].startswith('uid='):
-            return [ UID_RE.match(m).group(1) for m in members ]
+            return [ self.UID_RE.match(m).group(1) for m in members ]
         return members
+
+
+class Generator:
+    # Query patterns for LDAP
+    QUERY_MAIN = ('ou=project,ou=groups,dc=apache,dc=org', 'member')
+    QUERY_PMC = ('ou=project,ou=groups,dc=apache,dc=org', 'owner')
+    QUERY_COMMITTERS = ('ou=groups,dc=apache,dc=org', 'memberUid')
+
+    def __init__(self, ldap_url, queries, explicit):
+        self.client = LDAPClient(ldap_url)
+        self.queries = queries
+        self.explicit = explicit
+
+    def group_members(self, group):
+        "Given an authz @GROUP, return its members."
+
+        if group in self.explicit:
+            # This is an explicitly-defined authz group; not LDAP.
+            return self.explicit[group]
+
+        # Trim the authz group down to a {cn} value.
+        if group.endswith('-pmc'):
+            cn = group[:-4]
+        elif group.endswith('-ppmc'):
+            cn = group[:-5]
+        else:
+            cn = group
+
+        if group == 'committers':
+            # Special case this one. It uses a different attribute.
+            dn, attr = self.QUERY_COMMITTERS
+        elif group in self.queries:
+            # These are defined in [special]
+            dn = self.queries[group]
+            attr = None
+        elif group != cn:
+            # cn has had -(p)pmc sliced off. Look up the PMC.
+            dn, attr = self.QUERY_PMC
+        else:
+            # Not explicit, committers, special, or a PMC. Thus, it is
+            # a list of a project's committers.
+            dn, attr = self.QUERY_MAIN
+
+        # Find the group members within LDAP.
+        return self.client.get_members(cn, dn, attr)
+
+    def write_files(self):
+        pass

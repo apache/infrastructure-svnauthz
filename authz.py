@@ -22,6 +22,8 @@ import asfpy.syslog
 import yaml
 import ezt
 
+import gen
+
 #print = asfpy.syslog.Printer(stdout=True, identity="authz")
 
 # The service will set the working directory, so we can find this.
@@ -36,11 +38,17 @@ GATHER_DELAY = 60
 # (recently) signaled a need to write the authz files.
 FAR_FUTURE = 1e13
 
+### move this to the config
+LDAP_URL = 'ldaps://ldap-us-ro.apache.org'
+
 
 class Authorization:
     def __init__(self, cfg, debug=False):
         self.cfg = cfg
         self.debug = debug
+
+        ### read auth.conf ... better yet: merge that into the yaml config
+        self.gen = gen.Generator(LDAP_URL, (), ())
 
         # Write new authz files on startup.
         self.write_signal = 0  # epoch
@@ -62,6 +70,7 @@ class Authorization:
         self.write_signal = FAR_FUTURE
         if self.debug:
             print('WRITE_FILES: written at', time.time())
+        self.gen.write_files()
 
     def handler(self, payload):
         # If a (re)write has been signaled, then wait for a bit before
