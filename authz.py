@@ -48,24 +48,29 @@ class Authorization:
         # avoid writing for each change. Gather them up for a bit of time,
         # then dump the group of changes into the new authz files.
         self.delay = cfg['config']['delay']
-        print('DELAY:', self.delay)
+        if debug:
+            print('DELAY:', self.delay)
 
         url = cfg['config']['ldap']
-        print('LDAP:', url)
+        if debug:
+            print('LDAP:', url)
 
-        print('AUTH:', cfg['special']['auth'])
-        print('GROUPS:', cfg['special']['groups'])
-        print('SERVICES:', cfg['special']['services'])
+        if debug:
+            print('AUTH:', cfg['special']['auth'])
+            print('GROUPS:', cfg['special']['groups'])
+            print('SERVICES:', cfg['special']['services'])
+            print('EXPLICIT:', cfg['explicit'])
+
         special = { a: self.DN_AUTH for a in cfg['special']['auth'] }
         special.update((g, self.DN_GROUPS) for g in cfg['special']['groups'])
         special.update((s, self.DN_SERVICES) for s in cfg['special']['services'])
-        print('EXPLICIT:', cfg['explicit'])
 
         self.gen = gen.Generator(url, special, cfg['explicit'])
 
         tdir = cfg['generate']['template_dir']
         odir = cfg['generate']['output_dir']
-        #print(f'TDIR: {tdir}\nODIR: {odir}')
+        if debug:
+            print(f'TDIR: {tdir}\nODIR: {odir}')
 
         self.mappings = { }
         for name in cfg['generate']:
@@ -94,10 +99,13 @@ class Authorization:
 
     def write_files(self):
         self.write_signal = FAR_FUTURE
+        t0 = time.time()
         if self.debug:
-            print('WRITE_FILES: written at', time.time())
+            print('WRITE_FILES: written at', t0)
         for t, o in self.mappings.items():
             self.gen.write_file(t, o)
+        if self.debug:
+            print(f'  DURATION: {time.time() - t0}')
 
     def handler(self, payload):
         # If a (re)write has been signaled, then wait for a bit before
