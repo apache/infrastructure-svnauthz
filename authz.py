@@ -15,12 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os.path
 import time
 
 import asfpy.pubsub
 import asfpy.syslog
 import yaml
-import ezt
 
 import gen
 
@@ -29,17 +29,9 @@ import gen
 # The service will set the working directory, so we can find this.
 CONFIG_FNAME = 'authz.yaml'
 
-# Gather up a bunch of changes, then write new files. We want to
-# avoid writing for each change. Gather them up for a bit of time,
-# then dump the group of changes into the new authz files.
-GATHER_DELAY = 60
-
 # Specify a time in the far future to indicate that we have not
 # (recently) signaled a need to write the authz files.
 FAR_FUTURE = 1e13
-
-### move this to the config
-LDAP_URL = 'ldaps://ldap-us-ro.apache.org'
 
 
 class Authorization:
@@ -47,8 +39,37 @@ class Authorization:
         self.cfg = cfg
         self.debug = debug
 
+        # Gather up a bunch of changes, then write new files. We want to
+        # avoid writing for each change. Gather them up for a bit of time,
+        # then dump the group of changes into the new authz files.
+        self.delay = cfg['config']['delay']
+        print('DELAY:', self.delay)
+
+        url = cfg['config']['ldap']
+        print('LDAP:', url)
+
         ### read auth.conf ... better yet: merge that into the yaml config
-        self.gen = gen.Generator(LDAP_URL, (), ())
+        ### for now: ln -s modules/subversion_server/files/authorization/auth.conf .
+        import configparser
+        cp = configparser.ConfigParser()
+        cp.read('auth.conf')
+        special = dict((k, v.strip()) for k, v in cp.items('special'))
+        explicit = dict((k, v.split()) for k, v in cp.items('explicit'))
+
+        self.gen = gen.Generator(url, special, explicit)
+
+        tdir = cfg['generate']['template_dir']
+        odir = cfg['generate']['output_dir']
+        #print(f'TDIR: {tdir}\nODIR: {odir}')
+
+        self.mappings = { }
+        for name in cfg['generate']:
+            ob = cfg['generate'][name]
+            if isinstance(ob, dict):
+                # Note: NAME is unused, except as a descriptor/grouping
+                t = os.path.join(tdir, ob['template'])
+                o = os.path.join(odir, ob['output'])
+                self.mappings[t] = o
 
         # Write new authz files on startup.
         self.write_signal = 0  # epoch
@@ -70,14 +91,15 @@ class Authorization:
         self.write_signal = FAR_FUTURE
         if self.debug:
             print('WRITE_FILES: written at', time.time())
-        self.gen.write_files()
+        for t, o in self.mappings.items():
+            self.gen.write_file(t, o)
 
     def handler(self, payload):
         # If a (re)write has been signaled, then wait for a bit before
         # writing more files. This prevents rewriting on EVERY change.
         # Given that a heartbeat occurs every 5 seconds (as of this
         # comment), we'll get an opportunity to check/write.
-        if time.time() > self.write_signal + GATHER_DELAY:
+        if time.time() > self.write_signal + self.delay:
             self.write_files()
 
         # What kind of packet/payload arrived from PUBSUB ?

@@ -18,6 +18,7 @@
 import re
 
 import ldap
+import ezt
 
 
 class FunkyLDAP(Exception):
@@ -74,9 +75,9 @@ class Generator:
     QUERY_PMC = ('ou=project,ou=groups,dc=apache,dc=org', 'owner')
     QUERY_COMMITTERS = ('ou=groups,dc=apache,dc=org', 'memberUid')
 
-    def __init__(self, ldap_url, queries, explicit):
+    def __init__(self, ldap_url, special, explicit):
         self.client = LDAPClient(ldap_url)
-        self.queries = queries
+        self.special = special
         self.explicit = explicit
 
     def group_members(self, group):
@@ -97,9 +98,9 @@ class Generator:
         if group == 'committers':
             # Special case this one. It uses a different attribute.
             dn, attr = self.QUERY_COMMITTERS
-        elif group in self.queries:
+        elif group in self.special:
             # These are defined in [special]
-            dn = self.queries[group]
+            dn = self.special[group]
             attr = None
         elif group != cn:
             # cn has had -(p)pmc sliced off. Look up the PMC.
@@ -112,5 +113,5 @@ class Generator:
         # Find the group members within LDAP.
         return self.client.get_members(cn, dn, attr)
 
-    def write_files(self):
-        pass
+    def write_file(self, template, output):
+        print(f'WRITE_FILE: t="{template}" o="{output}"')
