@@ -35,6 +35,11 @@ FAR_FUTURE = 1e13
 
 
 class Authorization:
+    # There are some groups with custom DN values
+    DN_AUTH = 'ou=auth,ou=groups,dc=apache,dc=org'
+    DN_GROUPS = 'ou=groups,dc=apache,dc=org'
+    DN_SERVICES = 'ou=groups,ou=services,dc=apache,dc=org'
+
     def __init__(self, cfg, debug=False):
         self.cfg = cfg
         self.debug = debug
@@ -48,15 +53,15 @@ class Authorization:
         url = cfg['config']['ldap']
         print('LDAP:', url)
 
-        ### read auth.conf ... better yet: merge that into the yaml config
-        ### for now: ln -s modules/subversion_server/files/authorization/auth.conf .
-        import configparser
-        cp = configparser.ConfigParser()
-        cp.read('auth.conf')
-        special = dict((k, v.strip()) for k, v in cp.items('special'))
-        explicit = dict((k, v.split()) for k, v in cp.items('explicit'))
+        print('AUTH:', cfg['special']['auth'])
+        print('GROUPS:', cfg['special']['groups'])
+        print('SERVICES:', cfg['special']['services'])
+        special = { a: self.DN_AUTH for a in cfg['special']['auth'] }
+        special.update((g, self.DN_GROUPS) for g in cfg['special']['groups'])
+        special.update((s, self.DN_SERVICES) for s in cfg['special']['services'])
+        print('EXPLICIT:', cfg['explicit'])
 
-        self.gen = gen.Generator(url, special, explicit)
+        self.gen = gen.Generator(url, special, cfg['explicit'])
 
         tdir = cfg['generate']['template_dir']
         odir = cfg['generate']['output_dir']
