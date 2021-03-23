@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import re
 
 import ldap
@@ -30,7 +31,7 @@ class LDAPClient:
     "An augmented connection to our LDAP servers."
 
     # Extract UIDs from an LDAP response.
-    UID_RE = re.compile(r'^uid=([^,]*),.*')
+    UID_RE = re.compile(rb'^uid=([^,]*),.*')
 
     # Disable cert check. The self-signed cert throws off python-ldap.
     ### global option, not per connection? ugh.
@@ -64,7 +65,7 @@ class LDAPClient:
 
         # Sometimes the result items look like: uid=FOO,ou=people,...
         # Trim to just the uid values.
-        if members[0].startswith('uid='):
+        if members[0].startswith(b'uid='):
             return [ self.UID_RE.match(m).group(1) for m in members ]
         return members
 
@@ -111,7 +112,31 @@ class Generator:
             dn, attr = self.QUERY_MAIN
 
         # Find the group members within LDAP.
-        return self.client.get_members(cn, dn, attr)
+        # Note: all member IDs are ascii, so convert to simple strings.
+        return [m.decode() for m in self.client.get_members(cn, dn, attr)]
 
     def write_file(self, template, output):
         print(f'WRITE_FILE: t="{template}" o="{output}"')
+
+        ### we should open/read/cache the template lines. for now:
+        lines = open(template).read().splitlines()
+
+        new_z = [ ]
+        for line in lines:
+            if line.startswith('#') or '={' not in line:
+                new_z.append(line)
+            else:
+                # Only GROUP={auth} is allowed here.
+                assert '={auth}' in line
+                group = line.split('=')[0]
+                ### Place this specific auth, at this point in the authz file.
+                ### This is temporary, as we manage this forward.
+                members = self.group_members(group)
+                new_z.append(f'{group}={",".join(members)}')
+
+        #print('AUTH:', repr(new_z))
+        # Write to an intermediate file, then do an atomic move into place.
+        ### TODO: throw an alert if the new file is "too different" from the old
+        tmp = '%s.%d' % (output, os.getpid())
+        open(tmp, 'w').write('\n'.join(new_z) + '\n')
+        os.rename(tmp, output)
