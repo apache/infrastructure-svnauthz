@@ -21,6 +21,7 @@ import time
 import asfpy.pubsub
 import asfpy.syslog
 import yaml
+import requests
 
 import gen
 
@@ -67,17 +68,21 @@ class Authorization:
 
         self.gen = gen.Generator(url, special, cfg['explicit'])
 
-        tdir = cfg['generate']['template_dir']
+        self.auth = (cfg['generate']['template_username'],
+                     cfg['generate']['template_password'],
+                     )
+
+        turl = cfg['generate']['template_url']
         odir = cfg['generate']['output_dir']
         if debug:
-            print(f'TDIR: {tdir}\nODIR: {odir}')
+            print(f'TURL: {turl}\nODIR: {odir}')
 
         self.mappings = { }
         for name in cfg['generate']:
             ob = cfg['generate'][name]
             if isinstance(ob, dict):
                 # Note: NAME is unused, except as a descriptor/grouping
-                t = os.path.join(tdir, ob['template'])
+                t = turl + ob['template']
                 o = os.path.join(odir, ob['output'])
                 self.mappings[t] = o
 
@@ -101,9 +106,10 @@ class Authorization:
         self.write_signal = FAR_FUTURE
         t0 = time.time()
         if self.debug:
-            print('WRITE_FILES: written at', t0)
+            print('WRITE_FILES: beginning at', t0)
         for t, o in self.mappings.items():
-            self.gen.write_file(t, o)
+            template = requests.get(t, auth=self.auth, timeout=30)
+            self.gen.write_file(template.text.splitlines(), o)
         if self.debug:
             print(f'  DURATION: {time.time() - t0}')
 

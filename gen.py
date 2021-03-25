@@ -115,14 +115,11 @@ class Generator:
         # Note: all member IDs are ascii, so convert to simple strings.
         return [m.decode() for m in self.client.get_members(cn, dn, attr)]
 
-    def write_file(self, template, output):
-        print(f'WRITE_FILE: t="{template}" o="{output}"')
-
-        ### we should open/read/cache the template lines. for now:
-        lines = open(template).read().splitlines()
+    def write_file(self, t_lines, output):
+        print(f'WRITE_FILE: writing to "{output}"')
 
         new_z = [ ]
-        for line in lines:
+        for line in t_lines:
             if line.startswith(':readonly:'):
                 # FORMAT:
                 #   :readonly:/some/random/path
