@@ -123,7 +123,18 @@ class Generator:
 
         new_z = [ ]
         for line in lines:
-            if line.startswith('#') or '={' not in line:
+            if line.startswith(':block:'):
+                # FORMAT:
+                #   :block:/some/random/path
+                #   :block:/root/path/(alt1|alt2|alt3)
+                if '(' in line:
+                    root, rest = line[7:].split('(')
+                    subdirs = [ root+p for p in rest[:-1].split('|') ]
+                else:
+                    subdirs = [ line[7:] ]
+                for s in subdirs:
+                    new_z.append(f'[{s}]\n* = r')
+            elif line.startswith('#') or '={' not in line:
                 new_z.append(line)
             else:
                 # Only GROUP={auth} is allowed here.
