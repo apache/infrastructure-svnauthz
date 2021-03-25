@@ -123,15 +123,15 @@ class Generator:
 
         new_z = [ ]
         for line in lines:
-            if line.startswith(':block:'):
+            if line.startswith(':readonly:'):
                 # FORMAT:
-                #   :block:/some/random/path
-                #   :block:/root/path/(alt1|alt2|alt3)
+                #   :readonly:/some/random/path
+                #   :readonly:/root/path/(alt1|alt2|alt3)
                 if '(' in line:
-                    root, rest = line[7:].split('(')
+                    root, rest = line[10:].split('(')
                     subdirs = [ root+p for p in rest[:-1].split('|') ]
                 else:
-                    subdirs = [ line[7:] ]
+                    subdirs = [ line[10:] ]
                 for s in subdirs:
                     new_z.append(f'[{s}]\n* = r')
             elif line.startswith('#') or '={' not in line:
