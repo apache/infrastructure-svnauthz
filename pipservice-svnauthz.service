@@ -4,8 +4,10 @@ Description=SVNAuthz Service
 [Service]
 Type=simple
 WorkingDirectory=/usr/local/etc/svnauthz
-ExecStart=/usr/bin/python authz.py --foreground
-ExecStop=/usr/bin/pkill -f authz.py || /bin/echo "authz.py exited"
+#ExecStart=/usr/bin/python authz.py --foreground
+ExecStart=/usr/bin/echo "authz start"
+#ExecStop=/usr/bin/pkill -f authz.py || /bin/echo "authz.py exited"
+ExecStop=/usr/bin/echo "authz stop"
 Restart=on-failure
 
 [Install]
