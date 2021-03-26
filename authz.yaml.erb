@@ -1,0 +1,123 @@
+config:
+  ldap: ldaps://ldap-us-ro.apache.org
+  delay: 60
+
+server:
+  url: https://pubsub.apache.org:2070/
+  username: <%= @custom['server_username'] %>
+  password: <%= @custom['server_password'] %>
+
+commit:
+  topic: git
+  #/infrastructure-p6/commit
+  path: modules/subversion_server/files
+
+ldap:
+  topic: ldap
+
+generate:
+  template_url: https://raw.githubusercontent.com/apache/infrastructure-p6/production/modules/subversion_server/files/authorization/
+  template_username: <%= @custom['template_username'] %>
+  template_password: <%= @custom['template_password'] %>
+
+  output_dir: /x1/svn/authorization-test
+
+  public:
+    template: asf-authorization-template
+    output: asf-authorization
+
+  private:
+    template: pit-authorization-template
+    output: pit-authorization
+
+  #dist
+
+special:
+  auth:  # ou=auth,ou=groups,dc=apache,dc=org
+    - db-ddlutils
+    - db-torque
+    - db-jdo
+    - db-derby
+
+    - hive-hcatalog
+
+    - jackrabbit-emeritus
+
+    - lucene-connectors
+    - lucene-lucy
+    - lucene-orp
+    - lucene-py
+
+    - openoffice-security
+
+    - perl-docs
+    - perl-test
+    - perl-sizelimit
+
+    - sling-emeritus
+
+    - xerces-p
+    - xerces-j
+
+    - xml-axkit
+    - xml-commons
+
+    - xmlgraphics-batik
+    - xmlgraphics-fop
+
+    # JCP stuff
+    - jcp-axis-nda
+    - jcp-tomee-nda
+    - jcp-servicemix-nda
+    - jcp-j2ee-nda
+    - jcp-j2ee-nda-ro
+    - jcp-jaxrs-nda
+    - jcp-jaxws-nda
+    # note jcp-nda is in the same order as foundation/Correspondence/JCP
+    # Do not make changes to jcp-nda without agreement from the person(s) in charge of the JCP NDA agreement
+    - jcp-nda
+    - jcp
+
+    - osgi-rw
+    - osgi-ro
+
+    # Miscellaneous
+    - accounting
+    - apachecon
+    - exec-officers
+    - fundraising
+    - svnadmins
+    - trademarks
+
+    # vp-brand, vp-marketing, vp-fundraising, vp-tac, vp-comdev
+    # NOTE: mispelled. it happens.
+    - pres-commitee-vps
+
+  groups:  # ou=groups,dc=apache,dc=org
+    - apsite
+    - concom
+    - member
+
+  services:  # ou=groups,ou=services,dc=apache,dc=org
+    - audit
+    - board
+    - infrastructure
+    - infrastructure-root
+    - pmc-chairs
+    - virtualmgmt
+    - asf-secretary
+
+explicit:
+  # Explicit group definitions (ie. not via LDAP).
+
+  httpd-security-extra: [ jchampion ]
+
+  legal: [ ]
+
+  perl-bootstrap: [ ]
+  perl-dbi: [ ]
+  perl-reload: [ ]
+
+  staff: [ ]
+
+  treasurer: [ myrle, rawkintrevo ]

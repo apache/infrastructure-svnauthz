@@ -28,7 +28,7 @@ import gen
 #print = asfpy.syslog.Printer(stdout=True, identity="authz")
 
 # The service will set the working directory, so we can find this.
-CONFIG_FNAME = 'svnauthz.yaml'
+CONFIG_FNAME = 'authz.yaml'
 
 # Specify a time in the far future to indicate that we have not
 # (recently) signaled a need to write the authz files.
