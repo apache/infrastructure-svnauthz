@@ -4,8 +4,8 @@ config:
 
 server:
   url: https://pubsub.apache.org:2070/
-  username: <%= @server_username %>
-  password: <%= @server_password %>
+  username: <%= @custom['server_username'] %>
+  password: <%= @custom['server_password'] %>
 
 commit:
   topic: git
@@ -17,8 +17,8 @@ ldap:
 
 generate:
   template_url: https://raw.githubusercontent.com/apache/infrastructure-p6/production/modules/subversion_server/files/authorization/
-  template_username: <%= @template_username %>
-  template_password: <%= @template_password %>
+  template_username: <%= @custom['template_username'] %>
+  template_password: <%= @custom['template_password'] %>
 
   output_dir: /x1/svn/authorization-test
 
