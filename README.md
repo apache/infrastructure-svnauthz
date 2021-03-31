@@ -7,4 +7,8 @@ the template(s).
 This uses the ASF's "pipservice" Puppet class to operate/configure
 the daemon.
 
+Encrypted vars used in Custom YAML templating are handled by the 
+subversion_server module as opposed to the pipservice module's
+'custom_yaml_template' option.
+
 _more tbd_
