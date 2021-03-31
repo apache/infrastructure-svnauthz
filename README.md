@@ -11,5 +11,4 @@ Encrypted vars used in Custom YAML templating are handled by the
 subversion_server module as opposed to the pipservice module's
 'custom_yaml_template' option.
 
-
 _more tbd_
