@@ -1,2 +1,3 @@
 asfpy>=0.26
 PyYAML
+ldap
