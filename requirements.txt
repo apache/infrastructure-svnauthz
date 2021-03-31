@@ -1,3 +1,3 @@
 asfpy>=0.26
 PyYAML
-python-ldap3
+python3-ldap
