@@ -4,6 +4,8 @@ Description=SVNAuthz Service
 [Service]
 Type=simple
 WorkingDirectory=/opt/svnauthz
+User=www-data
+Group=www-data
 ExecStart=/usr/local/bin/pipenv run python3 authz.py
 Restart=on-failure
 
