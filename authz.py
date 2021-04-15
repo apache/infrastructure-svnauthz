@@ -108,8 +108,12 @@ class Authorization:
         if self.debug:
             print('WRITE_FILES: beginning at', t0)
         for t, o in self.mappings.items():
-            template = requests.get(t, auth=self.auth, timeout=30)
-            self.gen.write_file(template.text.splitlines(), o)
+            if t.startswith('/'):
+                # File path. Just read it.
+                template = open(t).read()
+            else:
+                template = requests.get(t, auth=self.auth, timeout=30).text
+            self.gen.write_file(template.splitlines(), o)
         if self.debug:
             print(f'  DURATION: {time.time() - t0}')
 
