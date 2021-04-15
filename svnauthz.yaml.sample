@@ -1,3 +1,7 @@
+config:
+  ldap: ldaps://ldap.example.org
+  delay: 60
+
 server:
   url: https://pubsub.example.org:2070/
   username: johndoe
@@ -9,3 +13,45 @@ commit:
 
 ldap:
   topic: ldap
+
+generate:
+  template_url: https://repository.example.org/path/to/templates/
+  template_username: templates-repository-user
+  template_password: templates-repository-pass
+
+  output_dir: /path/to/output-directory
+
+  descriptive-name1:
+    template: template-file1
+    output: authz-file1
+
+  descriptive-name2:
+    template: template-file2
+    output: authz-file2
+
+special:
+  auth:  # ou=auth,ou=groups,dc=apache,dc=org
+    - auth-group1a
+    - auth-group1b
+
+    - auth-group2
+
+    - auth-group3
+
+  groups:  # ou=groups,dc=apache,dc=org
+    - group1
+    - group2
+
+  services:  # ou=groups,ou=services,dc=apache,dc=org
+    - service1
+    - service2
+    - service3
+
+explicit:
+  # Explicit group definitions (ie. not via LDAP).
+
+  groupA: [ john, jane, harry ]
+
+  groupB: [ alice, bob ]
+
+  groupC: [ ]
