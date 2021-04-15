@@ -36,3 +36,42 @@ This service is deployed and runs as a systemd service unit.
 ## Logging
 
 `journalctl -u pipservice-svnauthz.service`
+
+## Testing
+
+In order to test changes to template files
+
+* clone this repository to your workstation.
+* acquire an `svnauthz.yaml`
+  * from the production machine (easiest)
+  * or, from
+    [svnauthz.yaml.erb](https://github.com/apache/infrastructure-p6/blob/production/modules/subversion_server/templates/svnauthz.yaml.erb)
+    and insert two pairs of user/pass values
+* edit the .yaml
+  * change the `output_dir` to (say) `/tmp/authz`
+  * change the `template_url` to `/path/to/your/templates/`
+    (this will likely be `.../modules/subversion_server/files/authorization/`;
+    make sure the trailing slash is present)
+* create a subdir named `ref` to hold "reference" outputs
+* in the subdir, fetch the current/live set of authz files using
+  ```
+  $ scp svn-master.apache.org:/x1/svn/authorization/*n .
+  ```
+* start the daemon using
+  ```
+  $ ./authz.py
+  ```
+* the daemon will write a new set of output authz files at startup;
+  watch the debug output for the `WRITE_FILE:` lines
+* then you can check whether you made breaking changes, or just
+  minor acceptable changes (after stopping the daemon with ^C, or in
+  another window):
+  ```
+  $ diff /tmp/authz/asf-authorization ref/
+  ```
+* if you leave the daemon running, it will write the outputs at the
+  next LDAP change or next commit
+  (as of April 15, it is any commit to any git repository; in the
+  future, it will be limited to just the template area; you'll need
+  to stop/restart the daemon to regenerate files)
+
