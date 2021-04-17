@@ -42,6 +42,7 @@ This service is deployed and runs as a systemd service unit.
 In order to test changes to template files
 
 * clone this repository to your workstation.
+* ensure you have all dependencies installed, per `requirements.txt`
 * acquire an `svnauthz.yaml`
   * from the production machine (easiest)
   * or, from
