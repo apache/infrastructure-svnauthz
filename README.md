@@ -50,6 +50,7 @@ In order to test changes to template files
     and insert two pairs of user/pass values
 * edit the .yaml
   * change the `output_dir` to (say) `/tmp/authz`
+    * NOTE: make sure the directory exists before starting the daemon (it does not auto-create it)
   * change the `template_url` to `/path/to/your/templates/`
     (this will likely be `.../modules/subversion_server/files/authorization/`;
     make sure the trailing slash is present)
