@@ -53,8 +53,9 @@ In order to test changes to template files
     * NOTE: make sure the directory exists before starting the daemon (it does not auto-create it)
   * change the `template_url` to `/path/to/your/templates/`
     (this will likely be `.../modules/subversion_server/files/authorization/`;
-    make sure the trailing slash is present)
-* create a subdir named `ref` to hold "reference" outputs
+    make sure the trailing slash is present and use the full path to the file, relative is not supported.)
+* create a subdir named `ref` to hold "reference" outputs (call it anything and place it anywhere, it's just used
+     to hold a pristine copy of the auth files as comparision.)
 * in the subdir, fetch the current/live set of authz files using
   ```
   $ scp svn-master.apache.org:/x1/svn/authorization/*n .
@@ -65,7 +66,7 @@ In order to test changes to template files
   ```
 * the daemon will write a new set of output authz files at startup;
   watch the debug output for the `WRITE_FILE:` lines
-* then you can check whether you made breaking changes, or just
+* then you can check[1] whether you made breaking changes, or just
   minor acceptable changes (after stopping the daemon with ^C, or in
   another window):
   ```
@@ -77,3 +78,4 @@ In order to test changes to template files
   future, it will be limited to just the template area; you'll need
   to stop/restart the daemon to regenerate files)
 
+[1] The 'check' is currently just diffing the output, future may provide a syntax checker for validity.
