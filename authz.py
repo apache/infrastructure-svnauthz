@@ -56,15 +56,15 @@ class Authorization:
         # avoid writing for each change. Gather them up for a bit of time,
         # then dump the group of changes into the new authz files.
         self.delay = cfg['config']['delay']
-        self.verbose1('DELAY:', self.delay)
+        self.verbose2('DELAY:', self.delay)
 
         url = cfg['config']['ldap']
-        self.verbose1('LDAP:', url)
+        self.verbose2('LDAP:', url)
 
-        self.verbose1('AUTH:', cfg['special']['auth'])
-        self.verbose1('GROUPS:', cfg['special']['groups'])
-        self.verbose1('SERVICES:', cfg['special']['services'])
-        self.verbose1('EXPLICIT:', cfg['explicit'])
+        self.verbose2('AUTH:', cfg['special']['auth'])
+        self.verbose2('GROUPS:', cfg['special']['groups'])
+        self.verbose2('SERVICES:', cfg['special']['services'])
+        self.verbose2('EXPLICIT:', cfg['explicit'])
 
         special = { a: self.DN_AUTH for a in cfg['special']['auth'] }
         special.update((g, self.DN_GROUPS) for g in cfg['special']['groups'])
@@ -128,7 +128,7 @@ class Authorization:
         # What kind of packet/payload arrived from PUBSUB ?
 
         if 'stillalive' in payload:
-            self.verbose1('HEARTBEAT:', payload)
+            self.verbose2('HEARTBEAT:', payload)
         elif 'commit' in payload:
             self.handle_commit(payload['commit'])
         elif 'dn' in payload:
@@ -171,7 +171,7 @@ def main(args):
     # FUTURE: can add more topics here.
 
     url = cfg['server']['url'] + ','.join(topics)
-    authz.verbose1('URL:', url)
+    authz.verbose2('URL:', url)
 
     # Run forever
     ### FUTURE: use asfpy.pubsub.listen_forever()
