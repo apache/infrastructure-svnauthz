@@ -181,7 +181,9 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Monitor/generate svn authz files.')
     parser.add_argument('-v', '--verbose', action='count', default=0,
-                        help='Print more information during operation.')
+                        help=
+                          'Print information during operation.'
+                          ' Multiple uses, for additional information.')
     parser.add_argument('--test', action='store_true',
                         help='Run a test generation of the authz files.')
     parser.add_argument('--templates',
