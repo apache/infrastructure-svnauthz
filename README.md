@@ -56,26 +56,20 @@ In order to test changes to template files
     make sure the trailing slash is present and use the full path to the file, relative is not supported.)
 * create a subdir named `ref` to hold "reference" outputs (call it anything and place it anywhere, it's just used
      to hold a pristine copy of the auth files as comparision.)
-* in the subdir, fetch the current/live set of authz files using
+* in the `ref` directory, fetch the current/live set of authz files using
   ```
   $ scp svn-master.apache.org:/x1/svn/authorization/*n .
   ```
-* start the daemon using
+* generate a new set of authz files using:
   ```
-  $ ./authz.py
+  $ ./authz.py --test
   ```
-* the daemon will write a new set of output authz files at startup;
-  watch the debug output for the `WRITE_FILE:` lines
+  (note the daemon will not start; the script will produce the authz
+  files, then exit)
 * then you can check[1] whether you made breaking changes, or just
-  minor acceptable changes (after stopping the daemon with ^C, or in
-  another window):
+  your intended changes (maybe along with acceptable unintended changes):
   ```
   $ diff /tmp/authz/asf-authorization ref/
   ```
-* if you leave the daemon running, it will write the outputs at the
-  next LDAP change or next commit
-  (as of April 15, it is any commit to any git repository; in the
-  future, it will be limited to just the template area; you'll need
-  to stop/restart the daemon to regenerate files)
 
 [1] The 'check' is currently just diffing the output, future may provide a syntax checker for validity.
