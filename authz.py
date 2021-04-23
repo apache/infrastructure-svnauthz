@@ -17,6 +17,7 @@
 
 import os.path
 import time
+import argparse
 
 import asfpy.pubsub
 import asfpy.syslog
@@ -41,26 +42,29 @@ class Authorization:
     DN_GROUPS = 'ou=groups,dc=apache,dc=org'
     DN_SERVICES = 'ou=groups,ou=services,dc=apache,dc=org'
 
-    def __init__(self, cfg, debug=False):
+    def __init__(self, cfg, verbose=0):
         self.cfg = cfg
-        self.debug = debug
+
+        def verbose1(*args):
+            if verbose >= 1: print(*args)
+        def verbose2(*args):
+            if verbose >= 2: print(*args)
+        self.verbose1 = verbose1
+        self.verbose2 = verbose2
 
         # Gather up a bunch of changes, then write new files. We want to
         # avoid writing for each change. Gather them up for a bit of time,
         # then dump the group of changes into the new authz files.
         self.delay = cfg['config']['delay']
-        if debug:
-            print('DELAY:', self.delay)
+        self.verbose1('DELAY:', self.delay)
 
         url = cfg['config']['ldap']
-        if debug:
-            print('LDAP:', url)
+        self.verbose1('LDAP:', url)
 
-        if debug:
-            print('AUTH:', cfg['special']['auth'])
-            print('GROUPS:', cfg['special']['groups'])
-            print('SERVICES:', cfg['special']['services'])
-            print('EXPLICIT:', cfg['explicit'])
+        self.verbose1('AUTH:', cfg['special']['auth'])
+        self.verbose1('GROUPS:', cfg['special']['groups'])
+        self.verbose1('SERVICES:', cfg['special']['services'])
+        self.verbose1('EXPLICIT:', cfg['explicit'])
 
         special = { a: self.DN_AUTH for a in cfg['special']['auth'] }
         special.update((g, self.DN_GROUPS) for g in cfg['special']['groups'])
@@ -74,8 +78,7 @@ class Authorization:
 
         turl = cfg['generate']['template_url']
         odir = cfg['generate']['output_dir']
-        if debug:
-            print(f'TURL: {turl}\nODIR: {odir}')
+        self.verbose1(f'TURL: {turl}\nODIR: {odir}')
 
         self.mappings = { }
         for name in cfg['generate']:
@@ -96,8 +99,7 @@ class Authorization:
         self.write_signal = min(self.write_signal, time.time())
 
     def handle_commit(self, commit_info):
-        if self.debug:
-            print('COMMIT FILES:', commit_info['files'])
+        self.verbose1('COMMIT FILES:', commit_info['files'])
         ### check against cfg/commit/path
 
         self.write_needed()
@@ -105,8 +107,7 @@ class Authorization:
     def write_files(self):
         self.write_signal = FAR_FUTURE
         t0 = time.time()
-        if self.debug:
-            print('WRITE_FILES: beginning at', t0)
+        self.verbose1('WRITE_FILES: beginning at', t0)
         for t, o in self.mappings.items():
             if t.startswith('/'):
                 # File path. Just read it.
@@ -114,8 +115,7 @@ class Authorization:
             else:
                 template = requests.get(t, auth=self.auth, timeout=30).text
             self.gen.write_file(template.splitlines(), o)
-        if self.debug:
-            print(f'  DURATION: {time.time() - t0}')
+        self.verbose1(f'  DURATION: {time.time() - t0}')
 
     def handler(self, payload):
         # If a (re)write has been signaled, then wait for a bit before
@@ -128,8 +128,7 @@ class Authorization:
         # What kind of packet/payload arrived from PUBSUB ?
 
         if 'stillalive' in payload:
-            if self.debug:
-                print('HEARTBEAT:', payload)
+            self.verbose1('HEARTBEAT:', payload)
         elif 'commit' in payload:
             self.handle_commit(payload['commit'])
         elif 'dn' in payload:
@@ -137,8 +136,7 @@ class Authorization:
             # be incredibly difficult to map changes against what LDAP
             # records are needed by the authz files. So, just rebuild the
             # files, regardless.
-            if self.debug:
-                print('LDAP CHANGE:', payload['dn'])
+            self.verbose1('LDAP CHANGE:', payload['dn'])
             self.write_needed()
         else:
             # unknown payload. (???)
@@ -153,9 +151,16 @@ def asfpy_pubsub_listener(callback, url, username, password):
                                       raw=True)
 
 
-def main():
+def main(args):
     cfg = yaml.safe_load(open(CONFIG_FNAME))
-    authz = Authorization(cfg, debug=True)
+    authz = Authorization(cfg, args.verbose)
+
+    ### deal with args.templates
+
+    if args.test:
+        # Generate the files, then exit. No daemon.
+        authz.write_files()
+        return
 
     username = cfg['server']['username']
     password = cfg['server']['password']
@@ -166,8 +171,7 @@ def main():
     # FUTURE: can add more topics here.
 
     url = cfg['server']['url'] + ','.join(topics)
-    if authz.debug:
-        print('URL:', url)
+    authz.verbose1('URL:', url)
 
     # Run forever
     ### FUTURE: use asfpy.pubsub.listen_forever()
@@ -175,4 +179,17 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Monitor/generate svn authz files.')
+    parser.add_argument('-v', '--verbose', action='count', default=0,
+                        help='Print more information during operation.')
+    parser.add_argument('--test', action='store_true',
+                        help='Run a test generation of the authz files.')
+    parser.add_argument('--templates',
+                        help='Directory containing the (locally-modified) templates.')
+    args = parser.parse_args()
+
+    # When testing, always produce some of the basic debug output.
+    if args.test:
+        args.verbose = max(1, args.verbose)
+
+    main(args)
