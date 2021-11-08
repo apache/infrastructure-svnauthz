@@ -3,10 +3,10 @@
 ## About the SVNAuthz Service
 
 This daemon uses pubsub to watch for both: 
-  * template/defition changes for authz files
+  * template/definition changes for authz files
   * LDAP group changes to fill into the template(s).
 
-If either are detected, an updated asf-authorization and
+If either is detected, an updated asf-authorization and
 pit-authorization file will be generated in the directory
 specified as `output_dir` in the svnauthz.yaml.erb template 
 found in the subversion_server module.
