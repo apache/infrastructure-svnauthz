@@ -142,9 +142,12 @@ class Generator:
                 members = self.group_members(group)
                 new_z.append(f'{group}={",".join(members)}')
 
-        #print('AUTH:', repr(new_z))
-        # Write to an intermediate file, then do an atomic move into place.
-        ### TODO: throw an alert if the new file is "too different" from the old
-        tmp = '%s.%d' % (output, os.getpid())
-        open(tmp, 'w').write('\n'.join(new_z) + '\n')
-        os.rename(tmp, output)
+        atomic_write(output, '\n'.join(new_z) + '\n')
+
+
+def atomic_write(content, fname):
+    # Write to an intermediate file, then do an atomic move into place.
+    ### TODO: throw an alert if the new file is "too different" from the old
+    tmp = '%s.%d' % (fname, os.getpid())
+    open(tmp, 'w').write(content)
+    os.rename(tmp, output)
