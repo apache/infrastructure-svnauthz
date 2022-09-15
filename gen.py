@@ -22,10 +22,12 @@ import time
 import ldap
 import ezt
 
-### move this to the config file
+### move this to the config file, or LDAP
 SVN_ADMINS = 'gmcdonald,humbedooh,cml,christ,dfoulks,gstein,iroh'
 
 ### also, for config
+# Some projects allow committers to make releases.
+### should cross-check this list against Attic
 COMMITTERS_MAY_RELEASE = {
     'abdera',
     'bookkeeper',
@@ -195,8 +197,6 @@ class Generator:
             content.append(f'{p}={",".join(sorted(committers))}')
             content.append(f'{p}-pmc={",".join(sorted(pmc))}')
 
-        ### committers may release
-
         # Construct ACLs for all the projects.
         for p in sorted(projects - SKIP_PROJECTS):
             content.extend([
@@ -211,6 +211,8 @@ class Generator:
                 f'[/release/{p}]',
                 f'@{p}-pmc = rw',
                 ])
+
+            # Some projects allow committers to make releases.
             if p in COMMITTERS_MAY_RELEASE:
                 content.append(f'@{p} = rw')
 
