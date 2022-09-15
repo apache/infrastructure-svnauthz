@@ -143,14 +143,6 @@ class Authorization:
             pass
 
 
-def asfpy_pubsub_listener(callback, url, username, password):
-    "Construct and run a pubsub Listener forever."
-    print('Starting listener:', callback)
-    asfpy.pubsub.Listener(url).attach(callback,
-                                      auth=(username, password),
-                                      raw=True)
-
-
 def main(args):
     cfg = yaml.safe_load(open(CONFIG_FNAME))
     authz = Authorization(cfg, args.verbose)
@@ -174,8 +166,7 @@ def main(args):
     authz.verbose2('URL:', url)
 
     # Run forever
-    ### FUTURE: use asfpy.pubsub.listen_forever()
-    asfpy_pubsub_listener(authz.handler, url, username, password)
+    asfpy.pubsub.listen_forever(authz.handler, url, (username, password))
 
 
 if __name__ == '__main__':
