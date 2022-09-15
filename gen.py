@@ -150,4 +150,4 @@ def atomic_write(content, fname):
     ### TODO: throw an alert if the new file is "too different" from the old
     tmp = '%s.%d' % (fname, os.getpid())
     open(tmp, 'w').write(content)
-    os.rename(tmp, output)
+    os.rename(tmp, fname)
