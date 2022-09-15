@@ -25,6 +25,19 @@ import ezt
 ### move this to the config file
 SVN_ADMINS = 'gmcdonald,humbedooh,cml,christ,dfoulks,gstein,iroh'
 
+### also, for config
+COMMITTERS_MAY_RELEASE = {
+    'abdera',
+    'bookkeeper',
+    'calcite',
+    'camel',
+    'commons',
+    'couchdb',
+    'lucene',
+    'trafficcontrol',
+    'zookeeper',
+    }
+
 
 class FunkyLDAP(Exception):
     def __init__(self, cn):
@@ -170,7 +183,36 @@ class Generator:
         print('LEN:', len(projects))
         print('RV:', projects)
 
+        ### not sure what these are, but the old code did this.
+        SKIP_PROJECTS = { 'incubator', 'tac', 'diversity', 'security', }
+
+        # Define each of the authz groups: committers, and PMC members.
+        # For some reasons, incubator is moved to the end. ??
+        for p in sorted(projects - SKIP_PROJECTS) + ['incubator',]:
+            committers = self.group_members(p)
+            pmc = self.group_members(p+'-pmc')
+
+            content.append(f'{p}={",".join(sorted(committers))}')
+            content.append(f'{p}-pmc={",".join(sorted(pmc))}')
+
         ### committers may release
+
+        # Construct ACLs for all the projects.
+        for p in sorted(projects - SKIP_PROJECTS):
+            content.extend([
+                '',
+                '',
+                f'# {p}',
+                '',
+                f'[/dev/{p}]',
+                f'@{p}-pmc = rw',
+                f'@{p} = rw',
+                '',
+                f'[/release/{p}]',
+                f'@{p}-pmc = rw',
+                ])
+            if p in COMMITTERS_MAY_RELEASE:
+                content.append(f'@{p} = rw')
 
         content.append(DIST_EPILOGUE)
         atomic_write('\n'.join(content), output)
@@ -193,10 +235,11 @@ humbedooh = rw
 humbedooh = rw
 
 [groups]
-svnadmins={SVN_ADMINS}
+svnadmins={SVN_ADMINS}\
 """
 
 DIST_EPILOGUE = """\
+
 
 # incubator
 
