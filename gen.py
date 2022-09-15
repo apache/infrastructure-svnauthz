@@ -69,6 +69,13 @@ class LDAPClient:
             return [ self.UID_RE.match(m).group(1) for m in members ]
         return members
 
+    def get_all_cn(self, dn):
+        results = self.handle.search_s(dn, scope=ldap.SCOPE_ONELEVEL,
+                                       attrlist=['cn'])
+        # The CN attributes have a single value, which is a simple
+        # string, so pull it and decode from unicode.
+        return set(attrs['cn'][0].decode() for _, attrs in results)
+
 
 class Generator:
     # Query patterns for LDAP
