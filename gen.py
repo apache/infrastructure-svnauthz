@@ -17,9 +17,13 @@
 
 import os
 import re
+import time
 
 import ldap
 import ezt
+
+### move this to the config file
+SVN_ADMINS = 'gmcdonald,humbedooh,cml,christ,dfoulks,gstein,iroh'
 
 
 class FunkyLDAP(Exception):
@@ -150,6 +154,61 @@ class Generator:
                 new_z.append(f'{group}={",".join(members)}')
 
         atomic_write(output, '\n'.join(new_z) + '\n')
+
+    def write_dist(self, output):
+
+        content = [
+            DIST_PREAMBLE.format(
+                now=time.ctime(),
+                SVN_ADMINS=SVN_ADMINS,
+                ),
+            ]
+
+        # Fetch the list of projects. They are described by the CN
+        # values within the PROJECTS schema in LDAP.
+        projects = self.client.get_all_cn(self.QUERY_PMC[0])
+        print('LEN:', len(projects))
+        print('RV:', projects)
+
+        ### committers may release
+
+        content.append(DIST_EPILOGUE)
+        atomic_write('\n'.join(content), output)
+
+DIST_PREAMBLE = """\
+#
+# THIS IS A GENERATED FILE --- DO NOT EDIT
+#
+
+# Generated on: {now}
+
+[/]
+@svnadmins = rw
+* = r
+
+[/release/META]
+humbedooh = rw
+
+[/release/zzz]
+humbedooh = rw
+
+[groups]
+svnadmins={SVN_ADMINS}
+"""
+
+DIST_EPILOGUE = """\
+
+# incubator
+
+[/dev/incubator]
+@incubator-pmc = rw
+@incubator = rw
+
+[/release/incubator]
+@incubator-pmc = rw
+@incubator = rw
+
+"""
 
 
 def atomic_write(content, fname):
