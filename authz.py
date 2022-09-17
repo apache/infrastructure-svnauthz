@@ -80,6 +80,8 @@ class Authorization:
         odir = cfg['generate']['output_dir']
         self.verbose1(f'TURL: {turl}\nODIR: {odir}')
 
+        self.dist_authz = os.path.join(odir, cfg['generate']['dist_output'])
+
         self.mappings = { }
         for name in cfg['generate']:
             ob = cfg['generate'][name]
@@ -115,6 +117,9 @@ class Authorization:
             else:
                 template = requests.get(t, auth=self.auth, timeout=30).text
             self.gen.write_file(template.splitlines(), o)
+
+        self.gen.write_dist(self.dist_authz)
+
         self.verbose1(f'  DURATION: {time.time() - t0}')
 
     def handler(self, payload):
