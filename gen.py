@@ -217,7 +217,7 @@ class Generator:
                 content.append(f'@{p} = rw')
 
         content.append(DIST_EPILOGUE)
-        atomic_write('\n'.join(content), output)
+        atomic_write(output, '\n'.join(content))
 
 DIST_PREAMBLE = """\
 #
@@ -256,7 +256,7 @@ DIST_EPILOGUE = """\
 """
 
 
-def atomic_write(content, fname):
+def atomic_write(fname, content):
     # Write to an intermediate file, then do an atomic move into place.
     ### TODO: throw an alert if the new file is "too different" from the old
     tmp = '%s.%d' % (fname, os.getpid())
