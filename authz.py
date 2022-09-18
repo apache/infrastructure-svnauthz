@@ -171,7 +171,8 @@ def main(args):
     authz.verbose2('URL:', url)
 
     # Run forever
-    asfpy.pubsub.listen_forever(authz.handler, url, (username, password))
+    asfpy.pubsub.listen_forever(authz.handler, url, (username, password),
+                                raw=True)
 
 
 if __name__ == '__main__':
