@@ -18,6 +18,7 @@
 import os.path
 import time
 import argparse
+import logging
 
 import asfpy.pubsub
 import asfpy.syslog
@@ -26,7 +27,8 @@ import requests
 
 import gen
 
-#print = asfpy.syslog.Printer(stdout=True, identity="authz")
+
+LOGGER = logging.getLogger(__name__)
 
 # The service will set the working directory, so we can find this.
 CONFIG_FNAME = 'svnauthz.yaml'
@@ -78,7 +80,7 @@ class Authorization:
 
         turl = cfg['generate']['template_url']
         odir = cfg['generate']['output_dir']
-        self.verbose1(f'TURL: {turl}\nODIR: {odir}')
+        LOGGER.debug(f'TURL: {turl}\nODIR: {odir}')
 
         self.dist_authz = os.path.join(odir, cfg['generate']['dist_output'])
 
@@ -101,7 +103,7 @@ class Authorization:
         self.write_signal = min(self.write_signal, time.time())
 
     def handle_commit(self, commit_info):
-        self.verbose1('COMMIT FILES:', commit_info['files'])
+        LOGGER.debug(f'COMMIT FILES: {commit_info["files"]}')
         ### check against cfg/commit/path
 
         self.write_needed()
@@ -109,7 +111,7 @@ class Authorization:
     def write_files(self):
         self.write_signal = FAR_FUTURE
         t0 = time.time()
-        self.verbose1('WRITE_FILES: beginning at', t0)
+        LOGGER.debug(f'WRITE_FILES: beginning at {t0}')
         for t, o in self.mappings.items():
             if t.startswith('/'):
                 # File path. Just read it.
@@ -120,9 +122,11 @@ class Authorization:
 
         self.gen.write_dist(self.dist_authz)
 
-        self.verbose1(f'  DURATION: {time.time() - t0}')
+        LOGGER.debug(f'  DURATION: {time.time() - t0}')
 
     def handler(self, payload):
+        #LOGGER.debug(f'PAYLOAD: {payload}')
+
         # If a (re)write has been signaled, then wait for a bit before
         # writing more files. This prevents rewriting on EVERY change.
         # Given that a heartbeat occurs every 5 seconds (as of this
@@ -141,7 +145,7 @@ class Authorization:
             # be incredibly difficult to map changes against what LDAP
             # records are needed by the authz files. So, just rebuild the
             # files, regardless.
-            self.verbose1('LDAP CHANGE:', payload['dn'])
+            LOGGER.info(f'LDAP CHANGE: {payload["dn"]}')
             self.write_needed()
         else:
             # unknown payload. (???)
@@ -176,6 +180,9 @@ def main(args):
 
 
 if __name__ == '__main__':
+    ### use argparse to change the level
+    logging.basicConfig(level=logging.INFO)
+
     parser = argparse.ArgumentParser(description='Monitor/generate svn authz files.')
     parser.add_argument('-v', '--verbose', action='count', default=0,
                         help=
