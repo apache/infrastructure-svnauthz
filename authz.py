@@ -47,11 +47,8 @@ class Authorization:
     def __init__(self, cfg, verbose=0):
         self.cfg = cfg
 
-        def verbose1(*args):
-            if verbose >= 1: print(*args)
         def verbose2(*args):
             if verbose >= 2: print(*args)
-        self.verbose1 = verbose1
         self.verbose2 = verbose2
 
         # Gather up a bunch of changes, then write new files. We want to
