@@ -56,9 +56,10 @@ class LDAPClient:
     ### global option, not per connection? ugh.
     ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
-    def __init__(self, url):
+    def __init__(self, url, binddn, bindpw):
         # Easy to front-load client handle creation. It will lazy connect.
         self.handle = ldap.initialize(url)
+        self.handle.simple_bind_s(binddn, bindpw)
 
     def get_members(self, cn, dn, attr):
         if attr:
@@ -102,8 +103,8 @@ class Generator:
     QUERY_PMC = ('ou=project,ou=groups,dc=apache,dc=org', 'owner')
     QUERY_COMMITTERS = ('ou=groups,dc=apache,dc=org', 'memberUid')
 
-    def __init__(self, ldap_url, special, explicit):
-        self.client = LDAPClient(ldap_url)
+    def __init__(self, ldap_url, binddn, bindpw, special, explicit):
+        self.client = LDAPClient(ldap_url, binddn, bindpw)
         self.special = special
         self.explicit = explicit
 

@@ -69,7 +69,12 @@ class Authorization:
         special.update((g, self.DN_GROUPS) for g in cfg['special']['groups'])
         special.update((s, self.DN_SERVICES) for s in cfg['special']['services'])
 
-        self.gen = gen.Generator(url, special, cfg['explicit'])
+        self.gen = gen.Generator(url,
+                                 cfg['config']['binddn'],
+                                 cfg['config']['bindpw'],
+                                 special,
+                                 cfg['explicit'],
+                                 )
 
         self.auth = (cfg['generate']['template_username'],
                      cfg['generate']['template_password'],
