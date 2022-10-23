@@ -47,7 +47,8 @@ In order to test changes to template files
   * from the production machine (easiest)
   * or, from
     [svnauthz.yaml.erb](https://github.com/apache/infrastructure-p6/blob/production/modules/subversion_server/templates/svnauthz.yaml.erb)
-    and insert two pairs of user/pass values
+    and insert three pairs of user/pass values (for pubsub private data,
+    for the private git repository, and for binding to LDAP)
 * edit the .yaml
   * change the `output_dir` to (say) `/tmp/authz`
     * NOTE: make sure the directory exists before starting the daemon (it does not auto-create it)
