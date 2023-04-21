@@ -36,6 +36,7 @@ COMMITTERS_MAY_RELEASE = {
     'commons',
     'couchdb',
     'lucene',
+    'solr'
     'trafficcontrol',
     'zookeeper',
     }
