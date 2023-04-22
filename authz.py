@@ -119,7 +119,9 @@ class Authorization:
                 # File path. Just read it.
                 template = open(t).read()
             else:
-                template = requests.get(t, auth=self.auth, timeout=30).text
+                req = requests.get(t, auth=self.auth, timeout=30)
+                req.raise_for_status() # report failure
+                template = req.text
             self.gen.write_file(template.splitlines(), o)
 
         self.gen.write_dist(self.dist_authz)
