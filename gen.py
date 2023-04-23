@@ -20,7 +20,6 @@ import re
 import time
 
 import ldap
-import functools
 
 ### move this to the config file, or LDAP
 SVN_ADMINS = 'gmcdonald,humbedooh,cml,christ,dfoulks,gstein,iroh'
@@ -109,7 +108,6 @@ class Generator:
         self.special = special
         self.explicit = explicit
 
-    @functools.cache  # presume LDAP does not change between calls
     def group_members(self, group):
         "Given an authz @GROUP, return its members."
 
