@@ -198,6 +198,8 @@ if __name__ == '__main__':
 
     # When testing, always produce some of the basic debug output.
     if args.test:
+        # Switch the root logger to DEBUG.
+        logging.getLogger().setLevel(logging.DEBUG)
         args.verbose = max(1, args.verbose)
 
     main(args)
