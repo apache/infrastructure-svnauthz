@@ -59,10 +59,6 @@ class LDAPClient:
     # Extract UIDs from an LDAP response.
     UID_RE = re.compile(rb'^uid=([^,]*),.*')
 
-    # Disable cert check. The self-signed cert throws off python-ldap.
-    ### global option, not per connection? ugh.
-    ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-
     def __init__(self, url, binddn, bindpw):
         # Easy to front-load client handle creation. It will lazy connect.
         self.handle = ldap.initialize(url)
