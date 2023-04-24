@@ -21,6 +21,13 @@ import time
 
 import ldap
 
+# functools.cache was introduced in 3.9. Use it if available.
+try:
+    from functools import cache as maybe_cache
+except ImportError:
+    maybe_cache = lambda func: func
+
+
 ### move this to the config file, or LDAP
 SVN_ADMINS = 'gmcdonald,humbedooh,cml,christ,dfoulks,gstein,iroh'
 
@@ -108,6 +115,7 @@ class Generator:
         self.special = special
         self.explicit = explicit
 
+    @maybe_cache
     def group_members(self, group):
         "Given an authz @GROUP, return its members."
 
