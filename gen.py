@@ -162,6 +162,22 @@ class Generator:
                     subdirs = [ line[10:] ]
                 for s in subdirs:
                     new_z.append(f'[{s}]\n* = r')
+            elif line.startswith('LDAP'):
+                # Define a group using LDAP information.
+                # Line format:
+                # LDAP(+PMC): $TLPNAME
+                ### NOTE: we place this authz at this specific point in
+                ### the authz file, and do "group" and "group-pmc" in this
+                ### order to maintain backwards-compat identical generation
+                ### of the file. In the future, simplification will be
+                ### possible once we decide to trust a major change in
+                ### the authz files.
+                group = line.split(':')[1].strip()
+                members = self.group_members(group)
+                new_z.append(f'{group}={",".join(members)}')
+                if line.startswith('LDAP+PMC'):
+                    members = self.group_members(group + '-pmc')
+                    new_z.append(f'{group}-pmc={",".join(members)}')
             elif line.startswith('#') or '={' not in line:
                 new_z.append(line)
             else:
