@@ -47,6 +47,13 @@ COMMITTERS_MAY_RELEASE = {
     'zookeeper',
     }
 
+# Projects where CI is allowed to stage a candidate through a project-specific role account.
+# CI roles follow the syntax: svc_dist_$project and can be found in either 
+# LDAP via ou=users,ou=services,dc=apache,dc=org or via .htpasswd, depending on where
+# we are in the stages of things... (TBD)
+CI_MAY_STAGE = {
+    'logging',
+}
 
 class FunkyLDAP(Exception):
     def __init__(self, cn):
@@ -228,6 +235,7 @@ class Generator:
                 f'[/dev/{p}]',
                 f'@{p}-pmc = rw',
                 f'@{p} = rw',
+                f'svc_dist_{p} = rw' if p in CI_MAY_STAGE else '',  # svc_dist_foo may stage to /dev/foo if set up
                 '',
                 f'[/release/{p}]',
                 f'@{p}-pmc = rw',
