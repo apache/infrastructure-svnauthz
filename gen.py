@@ -49,7 +49,7 @@ COMMITTERS_MAY_RELEASE = {
 
 # Projects where CI is allowed to stage a candidate through a project-specific role account.
 # CI roles follow the syntax: svc_dist_$project and can be found in either 
-# LDAP via ou=users,ou=services,dc=apache,dc=org or via .htpasswd, depending on where
+# LDAP via ou=svn,ou=users,ou=services,dc=apache,dc=org or via .htpasswd, depending on where
 # we are in the stages of things... (TBD)
 CI_MAY_STAGE = {
     'logging',
