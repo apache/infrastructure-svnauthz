@@ -41,6 +41,7 @@ COMMITTERS_MAY_RELEASE = {
     'camel',
     'commons',
     'couchdb',
+    'druid',
     'lucene',
     'solr',
     'trafficcontrol',
