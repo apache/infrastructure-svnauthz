@@ -54,6 +54,7 @@ COMMITTERS_MAY_RELEASE = {
 # we are in the stages of things... (TBD)
 CI_MAY_STAGE = {
     'logging',
+    'incubator',
 }
 
 class FunkyLDAP(Exception):
