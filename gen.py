@@ -279,6 +279,7 @@ DIST_EPILOGUE = """\
 [/dev/incubator]
 @incubator-pmc = rw
 @incubator = rw
+svc_dist_incubator = rw
 
 [/release/incubator]
 @incubator-pmc = rw
