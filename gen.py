@@ -55,6 +55,7 @@ COMMITTERS_MAY_RELEASE = {
 CI_MAY_STAGE = {
     'logging',
     'incubator',
+    'kie',
 }
 
 class FunkyLDAP(Exception):
