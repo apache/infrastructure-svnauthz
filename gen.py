@@ -248,6 +248,16 @@ class Generator:
             if p in COMMITTERS_MAY_RELEASE:
                 content.append(f'@{p} = rw')
 
+            # Podling role accounts would normally require incubator r/w, but we will carve out special perms here
+            if p in CI_MAY_STAGE:
+                content.extend([
+                    '',
+                    '# project role accounts also extend to /dev/incubator/$project',
+                    f'[/dev/incubator/{p}]',
+                    f'svc_dist_{p} = rw',
+                ])
+            
+
         content.append(DIST_EPILOGUE)
         atomic_write(output, '\n'.join(content))
 
