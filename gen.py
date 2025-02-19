@@ -56,6 +56,7 @@ CI_MAY_STAGE = {
     'logging',
     'incubator',
     'kie',
+    'directory',
 }
 
 class FunkyLDAP(Exception):
