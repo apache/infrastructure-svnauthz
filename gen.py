@@ -57,6 +57,7 @@ CI_MAY_STAGE = {
     'incubator',
     'kie',
     'directory',
+    'grails',
 }
 
 class FunkyLDAP(Exception):
