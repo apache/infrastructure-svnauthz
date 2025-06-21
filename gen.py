@@ -58,6 +58,7 @@ CI_MAY_STAGE = {
     'kie',
     'directory',
     'grails',
+    'daffodil',
 }
 
 class FunkyLDAP(Exception):
