@@ -97,7 +97,10 @@ class LDAPClient:
             elif 'member' in data:
                 members = data['member']
         else:
-            members = data[attr]
+            if attr in data:
+                members = data[attr]
+            else:
+                raise KeyError(f"cn={cn} does not have attribute {attr}!")
 
         # Sometimes the result items look like: uid=FOO,ou=people,...
         # Trim to just the uid values.
