@@ -100,7 +100,7 @@ class LDAPClient:
             if attr in data:
                 members = data[attr]
             else:
-                raise KeyError(f"cn={cn} does not have attribute {attr}!")
+                raise KeyError(f"LDAP group cn={cn} does not have any '{attr}' attributes, possibly corrupted/malformed in LDAP.")
 
         # Sometimes the result items look like: uid=FOO,ou=people,...
         # Trim to just the uid values.
