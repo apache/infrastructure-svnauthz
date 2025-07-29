@@ -28,9 +28,6 @@ except ImportError:
     maybe_cache = lambda func: func
 
 
-### move this to the config file, or LDAP
-SVN_ADMINS = 'gmcdonald,humbedooh,cml,dfoulks,iroh'
-
 ### also, for config
 # Some projects allow committers to make releases.
 ### should cross-check this list against Attic
@@ -121,6 +118,7 @@ class Generator:
     QUERY_MAIN = ('ou=project,ou=groups,dc=apache,dc=org', 'member')
     QUERY_PMC = ('ou=project,ou=groups,dc=apache,dc=org', 'owner')
     QUERY_COMMITTERS = ('ou=groups,dc=apache,dc=org', 'memberUid')
+    QUERY_SERVICE = ('ou=groups,ou=services,dc=apache,dc=org', 'member')
 
     def __init__(self, ldap_url, binddn, bindpw, special, explicit):
         self.client = LDAPClient(ldap_url, binddn, bindpw)
@@ -207,12 +205,18 @@ class Generator:
 
         atomic_write(output, '\n'.join(new_z) + '\n')
 
+    def get_admins(self):
+        dn, attr = self.QUERY_SERVICE
+        members = self.client.get_members('infrastructure-root', dn, attr)
+        return [m.decode() for m in members]
+        
+        
     def write_dist(self, output):
 
         content = [
             DIST_PREAMBLE.format(
                 now=time.ctime(),
-                SVN_ADMINS=SVN_ADMINS,
+                SVN_ADMINS=self.get_admins(),
                 ),
             ]
 
