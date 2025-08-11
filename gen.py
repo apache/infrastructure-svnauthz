@@ -42,6 +42,7 @@ COMMITTERS_MAY_RELEASE = {
     'commons',
     'couchdb',
     'druid',
+    'hive',
     'lucene',
     'solr',
     'trafficcontrol',
