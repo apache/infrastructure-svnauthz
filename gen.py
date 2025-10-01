@@ -39,6 +39,7 @@ COMMITTERS_MAY_RELEASE = {
     'commons',
     'couchdb',
     'druid',
+    'hive',
     'lucene',
     'solr',
     'trafficcontrol',
@@ -209,8 +210,8 @@ class Generator:
         dn, attr = self.QUERY_SERVICE
         members = self.client.get_members('infrastructure-root', dn, attr)
         return [m.decode() for m in members]
-        
-        
+
+
     def write_dist(self, output):
 
         content = [
