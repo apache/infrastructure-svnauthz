@@ -208,7 +208,7 @@ class Generator:
 
     def get_admins(self):
         dn, attr = self.QUERY_SERVICE
-        members = self.client.get_members('infrastructure-root', dn, attr)
+        members = self.client.get_members('svnadmins', dn, attr)
         return [m.decode() for m in members]
 
 
