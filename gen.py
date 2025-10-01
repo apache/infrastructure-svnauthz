@@ -97,6 +97,8 @@ class LDAPClient:
                 members = data['memberUid']
             elif 'member' in data:
                 members = data['member']
+            else:
+                raise KeyError(f"LDAP group cn={cn} does not have memberUid or member attribute, possibly corrupted/malformed in LDAP.")
         else:
             if attr in data:
                 members = data[attr]
