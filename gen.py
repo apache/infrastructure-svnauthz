@@ -29,7 +29,7 @@ except ImportError:
 
 
 ### move this to the config file, or LDAP
-SVN_ADMINS = 'gmcdonald,humbedooh,cml,dfoulks,wells,reanguiano'
+SVN_ADMINS = 'gmcdonald,humbedooh,cml,dfoulks,wells,reanguiano,bthomson'
 
 ### also, for config
 # Some projects allow committers to make releases.
