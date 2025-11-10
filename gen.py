@@ -54,12 +54,13 @@ COMMITTERS_MAY_RELEASE = {
 # LDAP via ou=svn,ou=users,ou=services,dc=apache,dc=org or via .htpasswd, depending on where
 # we are in the stages of things... (TBD)
 CI_MAY_STAGE = {
-    'logging',
-    'incubator',
-    'kie',
+    'daffodil',
     'directory',
     'grails',
-    'daffodil',
+    'incubator',
+    'kie',
+    'logging',
+    'pekko',
 }
 
 class FunkyLDAP(Exception):
