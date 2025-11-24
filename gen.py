@@ -61,6 +61,7 @@ CI_MAY_STAGE = {
     'kie',
     'logging',
     'pekko',
+    'solr',
 }
 
 class FunkyLDAP(Exception):
