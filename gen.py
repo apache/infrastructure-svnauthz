@@ -60,6 +60,7 @@ CI_MAY_STAGE = {
     'incubator',
     'kie',
     'logging',
+    'polaris',
     'pekko',
     'solr',
 }
