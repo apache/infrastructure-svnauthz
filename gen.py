@@ -35,7 +35,6 @@ SVN_ADMINS = 'gmcdonald,humbedooh,cml,dfoulks,wells,reanguiano,bthomson'
 # Some projects allow committers to make releases.
 ### should cross-check this list against Attic
 COMMITTERS_MAY_RELEASE = {
-    'abdera',
     'bookkeeper',
     'calcite',
     'camel',
@@ -45,7 +44,6 @@ COMMITTERS_MAY_RELEASE = {
     'hive',
     'lucene',
     'solr',
-    'trafficcontrol',
     'zookeeper',
     }
 
