@@ -34,6 +34,7 @@ SVN_ADMINS = 'gmcdonald,humbedooh,cml,dfoulks,wells,reanguiano,bthomson'
 ### also, for config
 # Some projects allow committers to make releases.
 ### should cross-check this list against Attic
+# Please adjust ATR's copy: https://github.com/apache/tooling-trusted-releases/blob/main/atr/registry.py
 COMMITTERS_MAY_RELEASE = {
     'bookkeeper',
     'calcite',
