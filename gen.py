@@ -62,6 +62,7 @@ CI_MAY_STAGE = {
     'polaris',
     'pekko',
     'solr',
+    'groovy',
 }
 
 class FunkyLDAP(Exception):
