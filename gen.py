@@ -63,6 +63,7 @@ CI_MAY_STAGE = {
     'pekko',
     'solr',
     'groovy',
+    'parquet',
 }
 
 class FunkyLDAP(Exception):
