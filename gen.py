@@ -93,7 +93,10 @@ class LDAPClient:
         # Should be a single result.
         if len(results) != 1:
             ### any data beyond the CN ?
-            raise FunkyLDAP(cn)
+            if not results:  # If no LDAP group by this name, it probably retired
+                raise FunkyLDAP(f"Mismatch between LDAP and authorization file: {cn} exists in authorization file but was not found in LDAP. Retired project??")
+            else:  # Too may results, should not happen
+                raise FunkyLDAP(cn)
 
         _, data = results[0]
         if attr is None:
