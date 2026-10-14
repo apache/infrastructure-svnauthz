@@ -38,7 +38,6 @@ COMMITTERS_MAY_RELEASE = {
     'bookkeeper',
     'calcite',
     'camel',
-    'commons',
     'couchdb',
     'druid',
     'hive',
