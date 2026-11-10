@@ -54,6 +54,7 @@ COMMITTERS_MAY_RELEASE = {
 CI_MAY_STAGE = {
     'daffodil',
     'directory',
+    'fory',
     'grails',
     'incubator',
     'kie',
@@ -63,7 +64,6 @@ CI_MAY_STAGE = {
     'pekko',
     'solr',
     'groovy',
-    'parquet',
 }
 
 class FunkyLDAP(Exception):
